@@ -26,7 +26,7 @@
    2) Clone the Garnet repo to a convenient location:
 
       #+BEGIN_SRC bash
-        clone git https://github.com/earl-ducaine/cl-garnet ~/garnet
+        clone git https://github.com/earl-ducaine/garnet-desktop-lab ~/garnet-desktop-lab
       #+END_SRC
 
    3) Make sure your Lisp isn't running, then create a symbolic link
@@ -35,7 +35,7 @@
 
       #+BEGIN_SRC bash
         cd ~/quicklisp/local-projects
-        ln -s ~/garnet .
+        ln -s ~/garnet-desktop-lab .
         rm ~/quicklisp/local-projects/system-index.txt
       #+END_SRC
 
