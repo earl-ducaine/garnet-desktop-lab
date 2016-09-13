@@ -11,14 +11,9 @@
 ;;; Implemented by Richard McDaniel
 
 
-
 (in-package :xomax)
 
-
 (defvar *test-debug* NIL)
-
-;; First we load required gadgets.  In this demo, we use the menubar and the
-;; motif-scrolling-window-with-bars gadgets.
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   ;; Only loads this file when not compiling all of Garnet.

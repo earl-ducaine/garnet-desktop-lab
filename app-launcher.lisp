@@ -31,42 +31,44 @@
 ;; (common-lisp-user::garnet-load "demos:demo-logo")
 
 (defparameter *package-list*
-   '(("3d" DEMO-3D)
-     ("angle" DEMO-ANGLE)
-     ("animator" DEMO-ANIMATOR)
-     ("arith" DEMO-ARITH)
-     ("virtual-agg" DEMO-VIRTUAL-AGG)
-     ("editor" DEMO-EDITOR)
-     ("file-browser" DEMO-FILE-BROWSER)
-     ("gadgets" DEMO-GADGETS)
-     ("garnetdraw" GARNETDRAW)
-     ("gesture" DEMO-GESTURE)
-     ("grow" DEMO-GROW)
-     ("manyobjs" DEMO-MANYOBJS)
-     ("menu" DEMO-MENU)
-     ("multifont" DEMO-MULTIFONT)
-     ("multiwin" DEMO-MULTIWIN)
-     ("othello" DEMO-OTHELLO)
-     ("pixmap" DEMO-PIXMAP)
-     ("schema-browser" DEMO-SCHEMA-BROWSER)
-     ("scrollbar" DEMO-SCROLLBAR)
-     ("text" DEMO-TEXT)
-     ("xasperate" DEMO-XASPERATE)
-     ("calculator" GARNET-CALCULATOR)
-     ("motif" DEMO-MOTIF)
-     ("graph" DEMO-GRAPH)
-     ("unistrokes" DEMO-UNISTROKES)))
+  '(("xomax" xomax)
+    ("3d" DEMO-3D)
+    ("angle" DEMO-ANGLE)
+    ("animator" DEMO-ANIMATOR)
+    ("arith" DEMO-ARITH)
+    ("virtual-agg" DEMO-VIRTUAL-AGG)
+    ("editor" DEMO-EDITOR)
+    ("file-browser" DEMO-FILE-BROWSER)
+    ("gadgets" DEMO-GADGETS)
+    ("garnetdraw" GARNETDRAW)
+    ("gesture" DEMO-GESTURE)
+    ("grow" DEMO-GROW)
+    ("manyobjs" DEMO-MANYOBJS)
+    ("menu" DEMO-MENU)
+    ("multifont" DEMO-MULTIFONT)
+    ("multiwin" DEMO-MULTIWIN)
+    ("othello" DEMO-OTHELLO)
+    ("pixmap" DEMO-PIXMAP)
+    ("schema-browser" DEMO-SCHEMA-BROWSER)
+    ("scrollbar" DEMO-SCROLLBAR)
+    ("text" DEMO-TEXT)
+    ("xasperate" DEMO-XASPERATE)
+    ("calculator" GARNET-CALCULATOR)
+    ("motif" DEMO-MOTIF)
+    ("graph" DEMO-GRAPH)
+    ("unistrokes" DEMO-UNISTROKES)))
 
 (defparameter *running* NIL)
 
 (defparameter *unloaded*
-    '("3d" "angle" "animator" "arith" "calculator" "editor"
+    '("xomax" "3d" "angle" "animator" "arith" "calculator" "editor"
       "file-browser" "gadgets" "garnetdraw" "othello" "grow" "manyobjs" "menu"
       "multifont" "multiwin" "pixmap" "schema-browser" "scrollbar"
       "text" "xasperate" "motif" "graph" "gesture" "unistrokes" "virtual-agg"))
 
 (defparameter Documentation-Strings
-  `(("3d" "Shows how buttons pretend
+  `(("xomax" "Text editor")
+    ("3d" "Shows how buttons pretend
 to move in 3-D in the
 Garnet widget set.")
     ("angle" "Shows how the angle-interactor
@@ -136,19 +138,19 @@ devised by David Goldberg at Xerox PARC.")
 
   (create-instance 'app-buttons garnet-gadgets:x-button-panel
     (:constant T)
-    (:left 2)(:top 40)
-    (:selection-function 'dispatcher)
+    (:left 2)(:top 60)
+    (:selection-function 'app-dispatcher)
     (:rank-margin (o-formula (ceiling (length (gvl :items)) 2)))
     (:items
         '("xomax")))
 
   (create-instance 'bt garnet-gadgets:x-button-panel
     (:constant T)
-    (:left 2)(:top 40)
+    (:left 150)(:top 40)
     (:selection-function 'dispatcher)
     (:rank-margin (o-formula (ceiling (length (gvl :items)) 2)))
     (:items
-        '("3d" "angle" "animator" "arith" "calculator" "editor"
+        '("xomax" "3d" "angle" "animator" "arith" "calculator" "editor"
           "file-browser" "gadgets" "garnetdraw" "gesture" "graph" "grow"
 	  "logo" "manyobjs" "menu" "motif" "multifont" "multiwin" "othello"
 	  "pixmap" "schema-browser" "scrollbar" "text" "xasperate"
@@ -213,7 +215,6 @@ Click the button to start the demo."))
   (s-value win2 :v-scroll :wheel-down :start-where (list :element-of-or-none (g-value win2 :parent)))
   (opal:update win2)
 
-  ;;if not CMU CommonLisp, then start the main event loop to look for events
   (inter:main-event-loop)
 )
 
@@ -255,9 +256,9 @@ Click the button to start the demo."))
 				       :test #'string=))))
 
       (when (member (car objlist) *unloaded* :test #'string=)
-            (load
-              (merge-pathnames
-	       (string-downcase package-name) common-lisp-user::Garnet-Demos-PathName))
+            ;; (load
+            ;;   (merge-pathnames
+	    ;;    (string-downcase package-name) common-lisp-user::Garnet-Demos-PathName))
             (setq *unloaded* (remove (car objlist) *unloaded* :test #'string=)))
       (opal:set-text text (string-trim (list #\newline #\space)
        (with-output-to-string (*standard-output*)
@@ -281,6 +282,14 @@ Click the button to start the demo."))
     (funcall (intern "DO-STOP"
         (cadar (member item *package-list* :key #'car :test #'string=)))))
 
+(defun app-dispatcher (inter obj)
+    (declare (ignore inter obj))
+    (let ((objlist (g-value app-buttons :value)))
+      (if (> (length objlist) (length *running*))
+        (start objlist)
+        (stop (deselected objlist)))
+      (setq *running* (copy-list objlist))))
+
 (defun dispatcher (inter obj)
     (declare (ignore inter obj))
     (let ((objlist (g-value bt :value)))
@@ -289,7 +298,7 @@ Click the button to start the demo."))
         (stop (deselected objlist)))
       (setq *running* (copy-list objlist))))
 
-(defun common-lisp-user::Garnet-Note-Quitted (package)
+(defun common-lisp-user::garnet-note-quitted (package)
   (let ((button-name NIL))
   (when (and (boundp 'win1) win1)
     (dolist (item *package-list*)
